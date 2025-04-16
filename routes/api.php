@@ -18,6 +18,7 @@ use App\Http\Controllers\DoctorScheduleController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\StatisticController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -115,3 +116,7 @@ Route::middleware(['auth:sanctum', 'role:Врач'])->post('appointments/{id}/pr
 Route::middleware(['auth:sanctum', 'role:Пациент'])->get('/patients/{patientId}/notifications', [NotificationController::class, 'index']);
 Route::patch('/notifications/{id}', [NotificationController::class, 'update']);
 Route::get('/available-times', [AppointmentController::class, 'getAvailableTimes']);
+Route::get('/available-dates', [AppointmentController::class, 'getAvailableDates']);
+Route::get('/statistics', [StatisticController::class, 'index']);
+Route::get('/statistics/general', [StatisticController::class, 'getGeneralStats']);
+Route::get('/statistics/general?period=month', [StatisticController::class, 'getGeneralStats']);

@@ -148,6 +148,58 @@ class AppointmentController extends Controller
 
         return response()->json(['available_times' => $available]);
     }
+    public function getAvailableDates(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'service_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Неверные входные данные'], 422);
+        }
+
+        $service = Service::find($request->service_id);
+
+        if (!$service) {
+            return response()->json(['error' => 'Услуга не найдена'], 404);
+        }
+
+        $doctorId = $service->doctor_id;
+        $schedule = Doctor_Shedule::where('doctor_id', $doctorId)->first();
+
+        if (!$schedule) {
+            return response()->json(['error' => 'Расписание не найдено'], 404);
+        }
+
+        $workingDays = collect($schedule->schedule)->pluck('day_of_week')->toArray();
+
+        // Преобразуем дни недели в Carbon-интерпретируемый формат
+        $daysMap = [
+            'Monday' => 1,
+            'Tuesday' => 2,
+            'Wednesday' => 3,
+            'Thursday' => 4,
+            'Friday' => 5,
+            'Saturday' => 6,
+            'Sunday' => 0,
+        ];
+
+        $daysNumbers = array_map(fn($day) => $daysMap[$day], $workingDays);
+
+        // Генерируем даты на ближайший месяц
+        $dates = [];
+        $today = Carbon::today();
+        $endDate = $today->copy()->addDays(30);
+
+        while ($today->lte($endDate)) {
+            if (in_array($today->dayOfWeek, $daysNumbers)) {
+                $dates[] = $today->format('Y-m-d');
+            }
+            $today->addDay();
+        }
+
+        return response()->json(['available_dates' => $dates]);
+    }
     public function showByPatientId($patient_id)
     {
         if (!is_numeric($patient_id) || $patient_id <= 0) {
