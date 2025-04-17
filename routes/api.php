@@ -120,3 +120,6 @@ Route::get('/available-dates', [AppointmentController::class, 'getAvailableDates
 Route::get('/statistics', [StatisticController::class, 'index']);
 Route::get('/statistics/general', [StatisticController::class, 'getGeneralStats']);
 Route::get('/statistics/general?period=month', [StatisticController::class, 'getGeneralStats']);
+Route::get('/statistics/doctors', [StatisticController::class, 'doctorsStats']);
+Route::get('/statistics/top-doctors', [StatisticController::class, 'topDoctors']);
+Route::get('/statistics/patients', [StatisticController::class, 'PatientStats']);
